@@ -13,33 +13,116 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 	{ 'mg979/vim-visual-multi',                 branch = 'master' },
-	{ 'echasnovski/mini.indentscope',           version = false },
-	{ 'echasnovski/mini.pairs',                 version = false },
+	{ "numToStr/Comment.nvim",                  opts = {} },
+	{ "folke/which-key.nvim",                   opts = {} },
+	{ "stevearc/dressing.nvim",                 event = "VeryLazy" },
 	{ "xiyaowong/telescope-emoji.nvim" },
 	{ "RRethy/vim-illuminate" },
-	{ "ggandor/leap.nvim" },
-	{ "ggandor/flit.nvim" },
 	{ 'nvim-treesitter/nvim-treesitter-context' },
-	{ "numToStr/Comment.nvim",                  opts = {} },
-	"tpope/vim-sleuth",
-	{ "folke/which-key.nvim",   opts = {} },
-	"tpope/vim-surround",
-	{ "karb94/neoscroll.nvim" },
-	{ "stevearc/dressing.nvim", event = "VeryLazy" },
-	{ "folke/noice.nvim",       dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify", } },
+	{ "tpope/vim-sleuth" },
+	{ "tpope/vim-surround" },
+	{
+		"karb94/neoscroll.nvim",
+		config = function()
+			require('neoscroll').setup()
+		end
+	},
+	{
+		"folke/noice.nvim",
+		dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify", },
+		config = function()
+			require("noice").setup({
+				cmdline = {
+					format = {
+						cmdline = { icon = ">" },
+						search_down = { icon = "search [v]" },
+						search_up = { icon = "search [^]" },
+						filter = { icon = "filter" },
+						lua = { icon = "lua" },
+						help = { icon = "help" },
+					}
+				}
+			})
+		end
+	},
+	{
+		"ggandor/flit.nvim",
+		config = function()
+			require('flit').setup {}
+		end
+	},
+	{
+		"ggandor/leap.nvim",
+		config = function()
+			require('leap').add_default_mappings()
+		end
+	},
+	{
+		'echasnovski/mini.pairs',
+		version = false,
+		config = function()
+			require('mini.pairs').setup()
+		end
+	},
+	{
+		'echasnovski/mini.indentscope',
+		version = false,
+		config = function()
+			require('mini.indentscope').setup()
+		end
+	},
+	{
+		'akinsho/bufferline.nvim',
+		version = "*",
+		dependencies = 'nvim-tree/nvim-web-devicons',
+		config = function()
+			require("bufferline").setup {}
+		end
+	},
+	{
+		"folke/todo-comments.nvim",
+		requires = "nvim-lua/plenary.nvim",
+		config = function()
+			require("todo-comments").setup {
+				highlight = {
+					pattern = [[.*<(KEYWORDS)\s* ]]
+				},
+				search = {
+					pattern = [[\b(KEYWORDS)\b]],
+				}
+			}
+		end
+	},
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.1",
 		dependencies = { "nvim-lua/plenary.nvim" },
+		config = function()
+			local telescope = require("telescope")
+			telescope.load_extension("file_browser")
+			telescope.load_extension("emoji")
+			telescope.setup({
+				defaults = {
+					sorting_strategy = "ascending",
+					layout_strategy = "horizontal",
+					layout_config = {
+						prompt_position = 'top',
+					},
+					mappings = {
+						i = {
+							["<esc>"] = require("telescope.actions").close,
+						},
+					},
+				},
+			})
+		end
 	},
 
 	{
 		"nvim-telescope/telescope-file-browser.nvim",
 		requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
 	},
-
 	{
-		-- LSP Configuration & Plugins
 		"neovim/nvim-lspconfig",
 		dependencies = {
 			{ "williamboman/mason.nvim",          config = true },
@@ -48,13 +131,11 @@ require("lazy").setup({
 			{ "folke/neodev.nvim" },
 		},
 	},
-
 	{
 		"hrsh7th/nvim-cmp",
 		dependencies = { "hrsh7th/cmp-nvim-lsp", "L3MON4D3/LuaSnip", "saadparwaiz1/cmp_luasnip",
 			"hrsh7th/cmp-buffer" },
 	},
-
 	{
 		"lewis6991/gitsigns.nvim",
 		opts = {
@@ -67,7 +148,6 @@ require("lazy").setup({
 			},
 		},
 	},
-
 	{
 		"nvim-lualine/lualine.nvim",
 		opts = {
@@ -79,7 +159,6 @@ require("lazy").setup({
 			},
 		},
 	},
-
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		opts = {
@@ -87,7 +166,6 @@ require("lazy").setup({
 			show_trailing_blankline_indent = false,
 		},
 	},
-
 	{
 		"nvim-treesitter/nvim-treesitter",
 		dependencies = {
@@ -95,7 +173,6 @@ require("lazy").setup({
 		},
 		build = ":TSUpdate",
 	},
-
 	{
 		'folke/tokyonight.nvim',
 		config = function()
@@ -124,44 +201,6 @@ require("lazy").setup({
 	},
 })
 
-require("telescope").load_extension("file_browser")
-require("telescope").load_extension("emoji")
-require("telescope").setup({
-	defaults = {
-		mappings = {
-			i = {
-				["<esc>"] = require("telescope.actions").close,
-			},
-		},
-	},
-})
-
-require('mini.indentscope').setup()
-require('mini.pairs').setup()
-require('leap').add_default_mappings()
-require('flit').setup {
-	keys = { f = 'f', F = 'F', t = 't', T = 'T' },
-	-- A string like "nv", "nvo", "o", etc.
-	labeled_modes = "v",
-	multiline = true,
-	-- Like `leap`s similar argument (call-specific overrides).
-	-- E.g.: opts = { equivalence_classes = {} }
-	opts = {}
-}
-require('neoscroll').setup()
-require("noice").setup({
-	cmdline = {
-		format = {
-			cmdline = { icon = ">" },
-			search_down = { icon = "search [v]" },
-			search_up = { icon = "search [^]" },
-			filter = { icon = "filter" },
-			lua = { icon = "lua" },
-			help = { icon = "help" },
-		}
-	}
-})
-
 -- Set leader key
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
@@ -182,15 +221,10 @@ vim.o.relativenumber = true
 vim.o.mouse = "a"
 
 -- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
 vim.o.clipboard = "unnamedplus"
 
 -- Enable break indent
 vim.o.breakindent = true
-
--- Save undo history
--- vim.o.undofile = true
 
 -- Keep signcolumn on by default
 vim.wo.signcolumn = "yes"
@@ -203,7 +237,6 @@ vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,noselect"
 
--- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
 -- [[ Highlight on yank ]]
@@ -251,6 +284,7 @@ require("nvim-treesitter.configs").setup({
 })
 
 local on_attach = function(_, bufnr)
+	vim.cmd([[autocmd BufWritePre <buffer> lua vim.lsp.buf.format()]])
 end
 
 local servers = {
@@ -339,7 +373,37 @@ cmp.setup({
 	}
 })
 
-vim.cmd([[autocmd BufWritePre <buffer> lua vim.lsp.buf.format()]])
+-- space maps
+vim.api.nvim_set_keymap("n", "<space>f", ":Telescope file_browser<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<space>b", ":Telescope buffers<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<space>d", ":Telescope diagnostics<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<space>s", ":Telescope lsp_document_symbols<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<space>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<space>l", ":Telescope live_grep<CR>", { noremap = true })
+vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, { buffer = bufnr, desc = '[R]ename' })
+vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'Code [A]ction' })
+vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = bufnr, desc = 'Hover Documentation' })
+vim.keymap.set('n', '<leader>c', ":bdelete<CR>", { buffer = bufnr, desc = '[C]lose buffer' })
 
+-- goto maps
+vim.keymap.set('n', 'gh', "^", { buffer = bufnr, desc = 'Goto line start' })
+vim.keymap.set('n', 'gl', "$", { buffer = bufnr, desc = 'Goto line end' })
+vim.keymap.set('n', 'gn', ":bnext<CR>", { buffer = bufnr, desc = 'Goto buffer [n]ext' })
+vim.keymap.set('n', 'gp', ":bprevious<CR>", { buffer = bufnr, desc = 'Goto buffer [p]revious' })
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = bufnr, desc = 'Goto [d]efinition' })
+vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = bufnr, desc = 'Goto [D]eclaration' })
+vim.keymap.set('n', 'gr', require('telescope.builtin').lsp_references, { buffer = bufnr, desc = 'Goto [r]eferences' })
+vim.keymap.set('n', 'gi', require('telescope.builtin').lsp_implementations,
+	{ buffer = bufnr, desc = 'Goto [i]mplementation' })
+vim.keymap.set('n', 'gt', require('telescope.builtin').lsp_type_definitions,
+	{ buffer = bufnr, desc = 'Goto [t]ype Definition' })
 
-require("keys")
+-- Diagnostic keymaps
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
+
+-- Remap for dealing with word wrap
+vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
