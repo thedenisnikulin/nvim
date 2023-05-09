@@ -12,6 +12,8 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+	{ "mfussenegger/nvim-dap" },
+	{ "nvim-telescope/telescope-dap.nvim" },
 	{ 'mg979/vim-visual-multi',                 branch = 'master' },
 	{ "numToStr/Comment.nvim",                  opts = {} },
 	{ "folke/which-key.nvim",                   opts = {} },
@@ -21,6 +23,13 @@ require("lazy").setup({
 	{ 'nvim-treesitter/nvim-treesitter-context' },
 	{ "tpope/vim-sleuth" },
 	{ "tpope/vim-surround" },
+	{ 'michaelb/sniprun',                       build = 'bash ./install.sh' },
+	{
+		"folke/zen-mode.nvim",
+		config = function()
+			require("zen-mode").setup {}
+		end
+	},
 	{
 		"karb94/neoscroll.nvim",
 		config = function()
@@ -99,8 +108,6 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function()
 			local telescope = require("telescope")
-			telescope.load_extension("file_browser")
-			telescope.load_extension("emoji")
 			telescope.setup({
 				defaults = {
 					sorting_strategy = "ascending",
@@ -115,6 +122,9 @@ require("lazy").setup({
 					},
 				},
 			})
+			telescope.load_extension("file_browser")
+			telescope.load_extension("emoji")
+			telescope.load_extension('dap')
 		end
 	},
 
@@ -328,6 +338,26 @@ mason_lspconfig.setup_handlers({
 local cmp = require("cmp")
 local luasnip = require("luasnip")
 
+local unlinkgrp = vim.api.nvim_create_augroup(
+	'UnlinkSnippetOnModeChange',
+	{ clear = true }
+)
+
+vim.api.nvim_create_autocmd('ModeChanged', {
+	group = unlinkgrp,
+	pattern = { 's:n', 'i:*' },
+	desc = 'Forget the current snippet when leaving the insert mode',
+	callback = function(evt)
+		if
+			luasnip.session
+			and luasnip.session.current_nodes[evt.buf]
+			and not luasnip.session.jump_active
+		then
+			luasnip.unlink_current()
+		end
+	end,
+})
+
 luasnip.config.setup({})
 
 cmp.setup({
@@ -374,16 +404,26 @@ cmp.setup({
 })
 
 -- space maps
-vim.api.nvim_set_keymap("n", "<space>f", ":Telescope file_browser<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<space>b", ":Telescope buffers<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<space>d", ":Telescope diagnostics<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<space>s", ":Telescope lsp_document_symbols<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<space>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<space>l", ":Telescope live_grep<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>f", ":Telescope file_browser<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>D", ":Telescope diagnostics<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true })
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, { buffer = bufnr, desc = '[R]ename' })
 vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'Code [A]ction' })
 vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = bufnr, desc = 'Hover Documentation' })
 vim.keymap.set('n', '<leader>c', ":bdelete<CR>", { buffer = bufnr, desc = '[C]lose buffer' })
+vim.keymap.set('n', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
+vim.keymap.set('n', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
+vim.keymap.set('n', '<leader>z', ":ZenMode<CR>", { buffer = bufnr, desc = '[z]en mode' })
+vim.keymap.set('n', '<leader>;b', ":Telescope dap list_breakpoints<CR>",
+	{ buffer = bufnr, desc = 'List debug [b]reakpoints' })
+vim.keymap.set('n', '<leader>;c', ":Telescope dap commands<CR>", { buffer = bufnr, desc = 'List debug [c]ommands' })
+vim.keymap.set('n', '<leader>;C', ":Telescope dap configurations<CR>",
+	{ buffer = bufnr, desc = 'List debug [C]onfigurations' })
+vim.keymap.set('n', '<leader>;f', ":Telescope dap frames<CR>", { buffer = bufnr, desc = 'List debug [f]rames' })
+vim.keymap.set('n', '<leader>;v', ":Telescope dap variables<CR>", { buffer = bufnr, desc = 'List debug [v]ariables' })
 
 -- goto maps
 vim.keymap.set('n', 'gh', "^", { buffer = bufnr, desc = 'Goto line start' })
@@ -399,10 +439,10 @@ vim.keymap.set('n', 'gt', require('telescope.builtin').lsp_type_definitions,
 	{ buffer = bufnr, desc = 'Goto [t]ype Definition' })
 
 -- Diagnostic keymaps
+vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
