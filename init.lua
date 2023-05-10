@@ -25,6 +25,20 @@ require("lazy").setup({
 	{ "tpope/vim-surround" },
 	{ 'michaelb/sniprun',                       build = 'bash ./install.sh' },
 	{
+		"jackMort/ChatGPT.nvim",
+		event = "VeryLazy",
+		config = function()
+			require("chatgpt").setup({
+				api_key_cmd = "cat ~/.openai_key"
+			})
+		end,
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+			"nvim-lua/plenary.nvim",
+			"nvim-telescope/telescope.nvim"
+		}
+	},
+	{
 		"folke/zen-mode.nvim",
 		config = function()
 			require("zen-mode").setup {}
