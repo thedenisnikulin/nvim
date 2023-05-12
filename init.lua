@@ -442,8 +442,6 @@ vim.keymap.set('n', '<leader>;f', ":Telescope dap frames<CR>", { buffer = bufnr,
 vim.keymap.set('n', '<leader>;v', ":Telescope dap variables<CR>", { buffer = bufnr, desc = 'List debug [v]ariables' })
 
 -- goto maps
-vim.keymap.set('n', 'gh', "^", { buffer = bufnr, desc = 'Goto line start' })
-vim.keymap.set('n', 'gl', "$", { buffer = bufnr, desc = 'Goto line end' })
 vim.keymap.set('n', 'gn', ":bnext<CR>", { buffer = bufnr, desc = 'Goto buffer [n]ext' })
 vim.keymap.set('n', 'gp', ":bprevious<CR>", { buffer = bufnr, desc = 'Goto buffer [p]revious' })
 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = bufnr, desc = 'Goto [d]efinition' })
