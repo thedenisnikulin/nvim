@@ -263,6 +263,18 @@ vim.o.completeopt = "menuone,noselect"
 
 vim.o.termguicolors = true
 
+-- Set backups
+vim.opt.backupdir = '/home/rw_panic0_0/.backup/nvim/'
+vim.opt.backup = true
+vim.api.nvim_create_autocmd('BufWritePre', {
+	group = vim.api.nvim_create_augroup('timestamp_backupext', { clear = true }),
+	desc = 'Add timestamp to backup extension',
+	pattern = '*',
+	callback = function()
+		vim.opt.backupext = '-' .. vim.fn.strftime('%Y%m%d%H%M')
+	end,
+})
+
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
@@ -418,7 +430,7 @@ cmp.setup({
 })
 
 -- space maps
-vim.api.nvim_set_keymap("n", "<leader>f", ":Telescope file_browser<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>f", ":Telescope file_browser path=%:p:h<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>D", ":Telescope diagnostics<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true })
