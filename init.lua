@@ -25,6 +25,25 @@ require("lazy").setup({
 	{ "tpope/vim-surround" },
 	{ 'michaelb/sniprun',                       build = 'bash ./install.sh' },
 	{
+		"cshuaimin/ssr.nvim",
+		config = function()
+			require("ssr").setup {
+				border = "rounded",
+				min_width = 50,
+				min_height = 5,
+				max_width = 120,
+				max_height = 25,
+				keymaps = {
+					close = "q",
+					next_match = "n",
+					prev_match = "N",
+					replace_confirm = "<CR>",
+					replace_all = "<leader><cr>",
+				},
+			}
+		end
+	},
+	{
 		"jackMort/ChatGPT.nvim",
 		event = "VeryLazy",
 		config = function()
@@ -231,6 +250,7 @@ vim.g.maplocalleader = " "
 
 -- Set tab size
 vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
 
 -- Set highlight on search
 vim.o.hlsearch = false
@@ -429,6 +449,64 @@ cmp.setup({
 	}
 })
 
+-- dap
+local dap = require("dap")
+dap.adapters.lldb = {
+	type = 'executable',
+	command = '/usr/bin/lldb-vscode', -- adjust as needed, must be absolute path
+	name = 'lldb'
+}
+
+dap.adapters.delve = {
+	type = 'server',
+	port = '${port}',
+	executable = {
+		command = 'dlv',
+		args = { 'dap', '-l', '127.0.0.1:${port}' },
+	}
+}
+
+dap.configurations.go = {
+	{
+		type = "delve",
+		name = "Debug",
+		request = "launch",
+		program = "${file}"
+	},
+	{
+		type = "delve",
+		name = "Debug test", -- configuration for debugging test files
+		request = "launch",
+		mode = "test",
+		program = "${file}"
+	},
+	-- works with go.mod packages and sub packages
+	{
+		type = "delve",
+		name = "Debug test (go.mod)",
+		request = "launch",
+		mode = "test",
+		program = "./${relativeFileDirname}"
+	}
+}
+
+dap.configurations.cpp = {
+	{
+		name = 'Launch',
+		type = 'lldb',
+		request = 'launch',
+		program = function()
+			return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+		end,
+		cwd = '${workspaceFolder}',
+		stopOnEntry = false,
+		args = {},
+	},
+}
+
+dap.configurations.c = dap.configurations.cpp
+dap.configurations.rust = dap.configurations.cpp
+
 -- space maps
 vim.api.nvim_set_keymap("n", "<leader>f", ":Telescope file_browser path=%:p:h<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true })
@@ -436,6 +514,7 @@ vim.api.nvim_set_keymap("n", "<leader>D", ":Telescope diagnostics<CR>", { norema
 vim.api.nvim_set_keymap("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<leader>F", ":Telescope filetypes<CR>", { noremap = true })
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, { buffer = bufnr, desc = '[R]ename' })
 vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'Code [A]ction' })
 vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = bufnr, desc = 'Hover Documentation' })
@@ -452,6 +531,7 @@ vim.keymap.set('n', '<leader>;C', ":Telescope dap configurations<CR>",
 	{ buffer = bufnr, desc = 'List debug [C]onfigurations' })
 vim.keymap.set('n', '<leader>;f', ":Telescope dap frames<CR>", { buffer = bufnr, desc = 'List debug [f]rames' })
 vim.keymap.set('n', '<leader>;v', ":Telescope dap variables<CR>", { buffer = bufnr, desc = 'List debug [v]ariables' })
+vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'structured [s]earch and [r]eplace' })
 
 -- goto maps
 vim.keymap.set('n', 'gn', ":bnext<CR>", { buffer = bufnr, desc = 'Goto buffer [n]ext' })
@@ -473,3 +553,6 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next diagnos
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+
+-- TODO just use nvim-dap it has all I need for debugging
