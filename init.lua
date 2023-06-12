@@ -200,6 +200,15 @@ require("lazy").setup({
 				component_separators = "|",
 				section_separators = "",
 			},
+			sections = {
+				lualine_c = {
+					{
+						'filename',
+						path = 1,
+
+					}
+				}
+			}
 		},
 	},
 	{
@@ -515,6 +524,7 @@ vim.api.nvim_set_keymap("n", "<leader>s", ":Telescope lsp_document_symbols<CR>",
 vim.api.nvim_set_keymap("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>F", ":Telescope filetypes<CR>", { noremap = true })
+vim.keymap.set('n', '<leader>N', ":Noice telescope<CR>", { buffer = bufnr, desc = '[N]otification history' })
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, { buffer = bufnr, desc = '[R]ename' })
 vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'Code [A]ction' })
 vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = bufnr, desc = 'Hover Documentation' })
