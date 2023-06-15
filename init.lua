@@ -60,7 +60,11 @@ require("lazy").setup({
 	{
 		"folke/zen-mode.nvim",
 		config = function()
-			require("zen-mode").setup {}
+			require("zen-mode").setup {
+				window = {
+					width = 150
+				},
+			}
 		end
 	},
 	{
@@ -141,6 +145,7 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function()
 			local telescope = require("telescope")
+			local actions = require("telescope.actions")
 			telescope.setup({
 				defaults = {
 					sorting_strategy = "ascending",
@@ -150,7 +155,15 @@ require("lazy").setup({
 					},
 					mappings = {
 						i = {
-							["<esc>"] = require("telescope.actions").close,
+							["<esc>"] = actions.close,
+							["<C-a>"] = actions.toggle_selection,
+
+							["<Tab>"] = actions.move_selection_next,
+							["<S-Tab>"] = actions.move_selection_previous,
+
+							-- doesn't work for some reason
+							-- ["<Down>"] = actions.toggle_selection + actions.move_selection_worse,
+							-- ["<Up>"] = actions.toggle_selection + actions.move_selection_better,
 						},
 					},
 				},
