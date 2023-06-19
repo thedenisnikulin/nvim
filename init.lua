@@ -12,6 +12,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+	{ "folke/neodev.nvim",                      opts = {} },
 	{ "mfussenegger/nvim-dap" },
 	{ "nvim-telescope/telescope-dap.nvim" },
 	{ 'mg979/vim-visual-multi',                 branch = 'master' },
@@ -24,6 +25,12 @@ require("lazy").setup({
 	{ "tpope/vim-sleuth" },
 	{ "tpope/vim-surround" },
 	{ 'michaelb/sniprun',                       build = 'bash ./install.sh' },
+	{
+		"theHamsta/nvim-dap-virtual-text",
+		config = function()
+			require("nvim-dap-virtual-text").setup()
+		end
+	},
 	{
 		"cshuaimin/ssr.nvim",
 		config = function()
@@ -43,20 +50,20 @@ require("lazy").setup({
 			}
 		end
 	},
-	{
-		"jackMort/ChatGPT.nvim",
-		event = "VeryLazy",
-		config = function()
-			require("chatgpt").setup({
-				api_key_cmd = "cat ~/.openai_key"
-			})
-		end,
-		dependencies = {
-			"MunifTanjim/nui.nvim",
-			"nvim-lua/plenary.nvim",
-			"nvim-telescope/telescope.nvim"
-		}
-	},
+	-- {
+	-- 	"jackMort/ChatGPT.nvim",
+	-- 	event = "VeryLazy",
+	-- 	config = function()
+	-- 		require("chatgpt").setup({
+	-- 			api_key_cmd = "cat ~/.openai_key"
+	-- 		})
+	-- 	end,
+	-- 	dependencies = {
+	-- 		"MunifTanjim/nui.nvim",
+	-- 		"nvim-lua/plenary.nvim",
+	-- 		"nvim-telescope/telescope.nvim"
+	-- 	}
+	-- },
 	{
 		"folke/zen-mode.nvim",
 		config = function()
@@ -530,13 +537,13 @@ dap.configurations.c = dap.configurations.cpp
 dap.configurations.rust = dap.configurations.cpp
 
 -- space maps
-vim.api.nvim_set_keymap("n", "<leader>f", ":Telescope file_browser path=%:p:h<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>D", ":Telescope diagnostics<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>F", ":Telescope filetypes<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>f", ":Telescope file_browser path=%:p:h<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>D", ":Telescope diagnostics<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>F", ":Telescope filetypes<CR>", { noremap = true })
 vim.keymap.set('n', '<leader>N', ":Noice telescope<CR>", { buffer = bufnr, desc = '[N]otification history' })
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, { buffer = bufnr, desc = '[R]ename' })
 vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'Code [A]ction' })
@@ -547,13 +554,6 @@ vim.keymap.set('n', '<leader>n', ":tabnew<CR>", { buffer = bufnr, desc = '[n]ew 
 vim.keymap.set('n', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
 vim.keymap.set('v', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
 vim.keymap.set('n', '<leader>z', ":ZenMode<CR>", { buffer = bufnr, desc = '[z]en mode' })
-vim.keymap.set('n', '<leader>;b', ":Telescope dap list_breakpoints<CR>",
-	{ buffer = bufnr, desc = 'List debug [b]reakpoints' })
-vim.keymap.set('n', '<leader>;c', ":Telescope dap commands<CR>", { buffer = bufnr, desc = 'List debug [c]ommands' })
-vim.keymap.set('n', '<leader>;C', ":Telescope dap configurations<CR>",
-	{ buffer = bufnr, desc = 'List debug [C]onfigurations' })
-vim.keymap.set('n', '<leader>;f', ":Telescope dap frames<CR>", { buffer = bufnr, desc = 'List debug [f]rames' })
-vim.keymap.set('n', '<leader>;v', ":Telescope dap variables<CR>", { buffer = bufnr, desc = 'List debug [v]ariables' })
 vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'structured [s]earch and [r]eplace' })
 
 -- goto maps
@@ -577,5 +577,55 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next diagnos
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
+-- debug maps
+local dap_widgets = require('dap.ui.widgets')
+vim.keymap.set('n', '<leader>;B', ":Telescope dap list_breakpoints<CR>",
+	{ buffer = bufnr, desc = 'List debug [B]reakpoints' })
+vim.keymap.set('n', '<leader>;c', ":Telescope dap commands<CR>", { buffer = bufnr, desc = 'List debug [c]ommands' })
+vim.keymap.set('n', '<leader>;C', ":Telescope dap configurations<CR>",
+	{ buffer = bufnr, desc = 'List debug [C]onfigurations' })
+vim.keymap.set('n', '<leader>;v', function() dap_widgets.centered_float(dap_widgets.scopes) end,
+	{ buffer = bufnr, desc = 'List debug [V]ariables' })
+vim.keymap.set('n', '<leader>;f', function() dap_widgets.centered_float(dap_widgets.frames) end,
+	{ buffer = bufnr, desc = 'List debug [f]rames' })
+vim.keymap.set('n', '<leader>K', function() dap_widgets.hover() end,
+	{ buffer = bufnr, desc = 'Debug Hover' })
 
--- TODO just use nvim-dap it has all I need for debugging
+vim.keymap.set('n', '<leader>;b', ":DapToggleBreakpoint<CR>", { buffer = bufnr, desc = 'Toggle [b]reakpoint' })
+vim.keymap.set('n', '<F5>', ":DapContinue<CR>", { buffer = bufnr, desc = 'Debug Continue' })
+vim.keymap.set('n', '<leader><F5>', ":DapTerminate<CR>", { buffer = bufnr, desc = 'Debug Terminate' })
+vim.keymap.set('n', '<F10>', ":DapStepOver<CR>", { buffer = bufnr, desc = 'Debug Step Over' })
+vim.keymap.set('n', '<F11>', ":DapStepInto<CR>", { buffer = bufnr, desc = 'Debug Step Into' })
+vim.keymap.set('n', '<leader><F11>', ":DapStepOut<CR>", { buffer = bufnr, desc = 'Debug Step Out' })
+
+-- TODO figure it out
+-- TODO "debug" tag at lualine when debugging
+
+-- local dap = require('dap')
+-- local api = vim.api
+-- local keymap_restore = {}
+-- dap.listeners.after['event_initialized']['me'] = function()
+-- 	for _, buf in pairs(api.nvim_list_bufs()) do
+-- 		local keymaps = api.nvim_buf_get_keymap(buf, 'n')
+-- 		for _, keymap in pairs(keymaps) do
+-- 			if keymap.lhs == "<leader>k" then
+-- 				table.insert(keymap_restore, keymap)
+-- 				api.nvim_buf_del_keymap(buf, 'n', '<leader>k')
+-- 			end
+-- 		end
+-- 	end
+-- 	api.nvim_set_keymap('n', '<leader>k', ':lua require("dap.ui.widgets").hover()<CR>', { silent = true })
+-- end
+--
+-- dap.listeners.after['event_terminated']['me'] = function()
+-- 	for _, keymap in pairs(keymap_restore) do
+-- 		api.nvim_buf_set_keymap(
+-- 			keymap.buffer,
+-- 			keymap.mode,
+-- 			keymap.lhs,
+-- 			keymap.rhs,
+-- 			{ silent = keymap.silent == 1 }
+-- 		)
+-- 	end
+-- 	keymap_restore = {}
+-- end
