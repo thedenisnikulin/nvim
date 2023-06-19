@@ -225,8 +225,17 @@ require("lazy").setup({
 					{
 						'filename',
 						path = 1,
-
 					}
+				},
+				lualine_x = {
+					{
+						function() return [[DEBUG: ]] .. require('dap').status() end,
+						cond = function() return string.len(require('dap').status()) ~= 0 end,
+						color = "WarningMsg"
+					},
+					{ "encoding" },
+					{ "fileformat" },
+					{ "filetype" },
 				}
 			}
 		},
@@ -272,6 +281,7 @@ require("lazy").setup({
 		end
 	},
 })
+
 
 -- Set leader key
 vim.g.mapleader = " "
@@ -567,65 +577,31 @@ vim.keymap.set('n', 'gi', require('telescope.builtin').lsp_implementations,
 vim.keymap.set('n', 'gt', require('telescope.builtin').lsp_type_definitions,
 	{ buffer = bufnr, desc = 'Goto [t]ype Definition' })
 
--- Diagnostic keymaps
+-- diagnostic keymaps
 vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
 
--- Remap for dealing with word wrap
+-- remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- debug maps
 local dap_widgets = require('dap.ui.widgets')
-vim.keymap.set('n', '<leader>;B', ":Telescope dap list_breakpoints<CR>",
-	{ buffer = bufnr, desc = 'List debug [B]reakpoints' })
+vim.keymap.set('n', '<leader>;b', ":Telescope dap list_breakpoints<CR>",
+	{ buffer = bufnr, desc = 'List debug [b]reakpoints' })
 vim.keymap.set('n', '<leader>;c', ":Telescope dap commands<CR>", { buffer = bufnr, desc = 'List debug [c]ommands' })
 vim.keymap.set('n', '<leader>;C', ":Telescope dap configurations<CR>",
 	{ buffer = bufnr, desc = 'List debug [C]onfigurations' })
 vim.keymap.set('n', '<leader>;v', function() dap_widgets.centered_float(dap_widgets.scopes) end,
-	{ buffer = bufnr, desc = 'List debug [V]ariables' })
+	{ buffer = bufnr, desc = 'List debug [v]ariables' })
 vim.keymap.set('n', '<leader>;f', function() dap_widgets.centered_float(dap_widgets.frames) end,
 	{ buffer = bufnr, desc = 'List debug [f]rames' })
 vim.keymap.set('n', '<leader>K', function() dap_widgets.hover() end,
 	{ buffer = bufnr, desc = 'Debug Hover' })
 
-vim.keymap.set('n', '<leader>;b', ":DapToggleBreakpoint<CR>", { buffer = bufnr, desc = 'Toggle [b]reakpoint' })
+vim.keymap.set('n', '<leader>B', ":DapToggleBreakpoint<CR>", { buffer = bufnr, desc = 'Toggle [B]reakpoint' })
 vim.keymap.set('n', '<F5>', ":DapContinue<CR>", { buffer = bufnr, desc = 'Debug Continue' })
 vim.keymap.set('n', '<leader><F5>', ":DapTerminate<CR>", { buffer = bufnr, desc = 'Debug Terminate' })
 vim.keymap.set('n', '<F10>', ":DapStepOver<CR>", { buffer = bufnr, desc = 'Debug Step Over' })
 vim.keymap.set('n', '<F11>', ":DapStepInto<CR>", { buffer = bufnr, desc = 'Debug Step Into' })
 vim.keymap.set('n', '<leader><F11>', ":DapStepOut<CR>", { buffer = bufnr, desc = 'Debug Step Out' })
-
--- TODO figure it out
--- TODO "debug" tag at lualine when debugging
-
--- local dap = require('dap')
--- local api = vim.api
--- local keymap_restore = {}
--- dap.listeners.after['event_initialized']['me'] = function()
--- 	for _, buf in pairs(api.nvim_list_bufs()) do
--- 		local keymaps = api.nvim_buf_get_keymap(buf, 'n')
--- 		for _, keymap in pairs(keymaps) do
--- 			if keymap.lhs == "<leader>k" then
--- 				table.insert(keymap_restore, keymap)
--- 				api.nvim_buf_del_keymap(buf, 'n', '<leader>k')
--- 			end
--- 		end
--- 	end
--- 	api.nvim_set_keymap('n', '<leader>k', ':lua require("dap.ui.widgets").hover()<CR>', { silent = true })
--- end
---
--- dap.listeners.after['event_terminated']['me'] = function()
--- 	for _, keymap in pairs(keymap_restore) do
--- 		api.nvim_buf_set_keymap(
--- 			keymap.buffer,
--- 			keymap.mode,
--- 			keymap.lhs,
--- 			keymap.rhs,
--- 			{ silent = keymap.silent == 1 }
--- 		)
--- 	end
--- 	keymap_restore = {}
--- end
