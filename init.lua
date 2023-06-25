@@ -25,6 +25,7 @@ require("lazy").setup({
 	{ "tpope/vim-sleuth" },
 	{ "tpope/vim-surround" },
 	{ 'michaelb/sniprun',                       build = 'bash ./install.sh' },
+	{ "APZelos/blamer.nvim" },
 	{
 		"theHamsta/nvim-dap-virtual-text",
 		config = function()
@@ -67,11 +68,7 @@ require("lazy").setup({
 	{
 		"folke/zen-mode.nvim",
 		config = function()
-			require("zen-mode").setup {
-				window = {
-					width = 150
-				},
-			}
+			require("zen-mode").setup {}
 		end
 	},
 	{
@@ -547,24 +544,30 @@ dap.configurations.c = dap.configurations.cpp
 dap.configurations.rust = dap.configurations.cpp
 
 -- space maps
-vim.keymap.set("n", "<leader>f", ":Telescope file_browser path=%:p:h<CR>", { noremap = true })
-vim.keymap.set("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true })
-vim.keymap.set("n", "<leader>D", ":Telescope diagnostics<CR>", { noremap = true })
-vim.keymap.set("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true })
-vim.keymap.set("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true })
-vim.keymap.set("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true })
-vim.keymap.set("n", "<leader>F", ":Telescope filetypes<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>f", ":Telescope file_browser path=%:p:h<CR>", { noremap = true, desc = "[f]ile browser" })
+vim.keymap.set("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true, desc = "[b]uffers" })
+vim.keymap.set("n", "<leader>D", ":Telescope diagnostics<CR>", { noremap = true, desc = "[D]iagnostics list" })
+vim.keymap.set("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true, desc = "Document [s]ymbols" })
+vim.keymap.set("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true, desc = "Workspace [S]ymbols" })
+vim.keymap.set("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true, desc = "[l]ive grep" })
+vim.keymap.set("n", "<leader>F", ":Telescope filetypes<CR>", { noremap = true, desc = "[F]iletypes list" })
 vim.keymap.set('n', '<leader>N', ":Noice telescope<CR>", { buffer = bufnr, desc = '[N]otification history' })
-vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, { buffer = bufnr, desc = '[R]ename' })
-vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'Code [A]ction' })
-vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = bufnr, desc = 'Hover Documentation' })
+vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = "Hover [d]iagnostic" })
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Diagnostic list" })
+vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, { buffer = bufnr, desc = 'LSP [r]ename' })
+vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'LSP Code [a]ction' })
+vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = bufnr, desc = 'LSP Hover Documentation' })
 vim.keymap.set('n', '<leader>c', ":bdelete<CR>", { buffer = bufnr, desc = '[c]lose buffer' })
 vim.keymap.set('n', '<leader>C', ":bdelete!<CR>", { buffer = bufnr, desc = '[C]lose buffer (unsaved)' })
 vim.keymap.set('n', '<leader>n', ":tabnew<CR>", { buffer = bufnr, desc = '[n]ew tab' })
 vim.keymap.set('n', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
 vim.keymap.set('v', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
 vim.keymap.set('n', '<leader>z', ":ZenMode<CR>", { buffer = bufnr, desc = '[z]en mode' })
-vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'structured [s]earch and [r]eplace' })
+vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'Structured [s]earch and [r]eplace' })
+vim.keymap.set('n', '<leader>o', 'o<Esc>0"_D', { buffer = bufnr, desc = 'New line below' })
+vim.keymap.set('n', '<leader>O', 'O<Esc>0"_D', { buffer = bufnr, desc = 'New line above' })
+vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'Structured [s]earch and [r]eplace' })
+vim.keymap.set('n', '<leader>gb', ':BlamerToggle', { buffer = bufnr, desc = '[g]it [b]lame' })
 
 -- goto maps
 vim.keymap.set('n', 'gn', ":bnext<CR>", { buffer = bufnr, desc = 'Goto buffer [n]ext' })
@@ -576,10 +579,6 @@ vim.keymap.set('n', 'gi', require('telescope.builtin').lsp_implementations,
 	{ buffer = bufnr, desc = 'Goto [i]mplementation' })
 vim.keymap.set('n', 'gt', require('telescope.builtin').lsp_type_definitions,
 	{ buffer = bufnr, desc = 'Goto [t]ype Definition' })
-
--- diagnostic keymaps
-vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
 -- remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -601,7 +600,8 @@ vim.keymap.set('n', '<leader>K', function() dap_widgets.hover() end,
 
 vim.keymap.set('n', '<leader>B', ":DapToggleBreakpoint<CR>", { buffer = bufnr, desc = 'Toggle [B]reakpoint' })
 vim.keymap.set('n', '<F5>', ":DapContinue<CR>", { buffer = bufnr, desc = 'Debug Continue' })
-vim.keymap.set('n', '<leader><F5>', ":DapTerminate<CR>", { buffer = bufnr, desc = 'Debug Terminate' })
 vim.keymap.set('n', '<F10>', ":DapStepOver<CR>", { buffer = bufnr, desc = 'Debug Step Over' })
 vim.keymap.set('n', '<F11>', ":DapStepInto<CR>", { buffer = bufnr, desc = 'Debug Step Into' })
 vim.keymap.set('n', '<leader><F11>', ":DapStepOut<CR>", { buffer = bufnr, desc = 'Debug Step Out' })
+
+-- TODO show error when dap continue doesn't work on start
