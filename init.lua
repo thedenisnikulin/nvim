@@ -1,3 +1,7 @@
+if vim.g.vscode then
+	os.exit()
+end
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system({
@@ -12,6 +16,30 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+	{
+		"mfussenegger/nvim-lint",
+		config = function()
+			require('lint').linters_by_ft = {
+				go = { 'golangcilint', }
+			}
+		end
+	},
+	{
+		"ray-x/go.nvim",
+		dependencies = {
+			"ray-x/guihua.lua",
+			"neovim/nvim-lspconfig",
+			"nvim-treesitter/nvim-treesitter",
+		},
+		config = function()
+			require("go").setup()
+		end,
+		event = { "CmdlineEnter" },
+		ft = { "go", 'gomod' },
+		build = ':lua require("go.install").update_all_sync()'
+	},
+
+	{ 'kvrohit/mellow.nvim' },
 	{ "folke/neodev.nvim",                      opts = {} },
 	{ "mfussenegger/nvim-dap" },
 	{ "nvim-telescope/telescope-dap.nvim" },
@@ -27,9 +55,51 @@ require("lazy").setup({
 	{ 'michaelb/sniprun',                       build = 'bash ./install.sh' },
 	{ "APZelos/blamer.nvim" },
 	{
+		'kevinhwang91/nvim-ufo',
+		dependencies = 'kevinhwang91/promise-async',
+		config = function()
+			require('ufo').setup({
+				provider_selector = function(bufnr, filetype, buftype)
+					return { 'treesitter', 'indent' }
+				end
+			})
+			vim.o.foldlevel = 100000 -- what the fuck, neovim plugins just suck soooooooooo much
+		end
+	},
+	{
+		"lewis6991/gitsigns.nvim",
+		config = function()
+			require("gitsigns").setup()
+		end
+	},
+	{
+		'kevinhwang91/nvim-hlslens',
+		config = function()
+			require('hlslens').setup()
+		end
+	},
+	{
+		"petertriho/nvim-scrollbar",
+		config = function()
+			require('scrollbar').setup({
+				handlers = {
+					search = true,
+				}
+			})
+		end
+	},
+	{
+		"ggandor/flit.nvim",
+		config = function()
+			require('flit').setup {
+				multiline = true
+			}
+		end
+	},
+	{
 		"theHamsta/nvim-dap-virtual-text",
 		config = function()
-			require("nvim-dap-virtual-text").setup()
+			require("nvim-dap-virtual-text").setup {}
 		end
 	},
 	{
@@ -51,20 +121,6 @@ require("lazy").setup({
 			}
 		end
 	},
-	-- {
-	-- 	"jackMort/ChatGPT.nvim",
-	-- 	event = "VeryLazy",
-	-- 	config = function()
-	-- 		require("chatgpt").setup({
-	-- 			api_key_cmd = "cat ~/.openai_key"
-	-- 		})
-	-- 	end,
-	-- 	dependencies = {
-	-- 		"MunifTanjim/nui.nvim",
-	-- 		"nvim-lua/plenary.nvim",
-	-- 		"nvim-telescope/telescope.nvim"
-	-- 	}
-	-- },
 	{
 		"folke/zen-mode.nvim",
 		config = function()
@@ -93,12 +149,6 @@ require("lazy").setup({
 					}
 				}
 			})
-		end
-	},
-	{
-		"ggandor/flit.nvim",
-		config = function()
-			require('flit').setup {}
 		end
 	},
 	{
@@ -170,6 +220,15 @@ require("lazy").setup({
 							-- ["<Up>"] = actions.toggle_selection + actions.move_selection_better,
 						},
 					},
+					preview = { ls_short = true },
+				},
+				extensions = {
+					file_browser = {
+						grouped = true,
+						dir_icon = "󰉋",
+						preview = { ls_short = true },
+						hidden = { file_browser = true, folder_browser = true },
+					},
 				},
 			})
 			telescope.load_extension("file_browser")
@@ -187,7 +246,7 @@ require("lazy").setup({
 		dependencies = {
 			{ "williamboman/mason.nvim",          config = true },
 			{ "williamboman/mason-lspconfig.nvim" },
-			{ "j-hui/fidget.nvim",                opts = {} },
+			{ "j-hui/fidget.nvim",                opts = {},    tag = "legacy" },
 			{ "folke/neodev.nvim" },
 		},
 	},
@@ -214,6 +273,7 @@ require("lazy").setup({
 			options = {
 				icons_enabled = false,
 				theme = "tokyonight",
+				--theme = "mellow",
 				component_separators = "|",
 				section_separators = "",
 			},
@@ -275,6 +335,7 @@ require("lazy").setup({
 				end
 			})
 			vim.cmd [[colorscheme tokyonight]]
+			--vim.cmd [[colorscheme mellow]]
 		end
 	},
 })
@@ -317,6 +378,10 @@ vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,noselect"
 
+vim.wo.wrap = true
+vim.wo.linebreak = true
+--vim.wo.list = false
+
 vim.o.termguicolors = true
 
 -- Set backups
@@ -329,6 +394,12 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 	callback = function()
 		vim.opt.backupext = '-' .. vim.fn.strftime('%Y%m%d%H%M')
 	end,
+})
+
+vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+	callback = function()
+		require("lint").try_lint()
+	end
 })
 
 -- [[ Highlight on yank ]]
@@ -546,7 +617,8 @@ dap.configurations.rust = dap.configurations.cpp
 -- space maps
 vim.keymap.set("n", "<leader>f", ":Telescope file_browser path=%:p:h<CR>", { noremap = true, desc = "[f]ile browser" })
 vim.keymap.set("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true, desc = "[b]uffers" })
-vim.keymap.set("n", "<leader>D", ":Telescope diagnostics<CR>", { noremap = true, desc = "[D]iagnostics list" })
+vim.keymap.set("n", "<leader>D", ":Telescope diagnostics<CR>",
+	{ noremap = true, desc = "[D]iagnostics list" })
 vim.keymap.set("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true, desc = "Document [s]ymbols" })
 vim.keymap.set("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true, desc = "Workspace [S]ymbols" })
 vim.keymap.set("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true, desc = "[l]ive grep" })
@@ -567,7 +639,7 @@ vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 
 vim.keymap.set('n', '<leader>o', 'o<Esc>0"_D', { buffer = bufnr, desc = 'New line below' })
 vim.keymap.set('n', '<leader>O', 'O<Esc>0"_D', { buffer = bufnr, desc = 'New line above' })
 vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'Structured [s]earch and [r]eplace' })
-vim.keymap.set('n', '<leader>gb', ':BlamerToggle', { buffer = bufnr, desc = '[g]it [b]lame' })
+vim.keymap.set('n', '<leader>gb', ':BlamerToggle<CR>', { buffer = bufnr, desc = '[g]it [b]lame' })
 
 -- goto maps
 vim.keymap.set('n', 'gn', ":bnext<CR>", { buffer = bufnr, desc = 'Goto buffer [n]ext' })
@@ -603,5 +675,14 @@ vim.keymap.set('n', '<F5>', ":DapContinue<CR>", { buffer = bufnr, desc = 'Debug 
 vim.keymap.set('n', '<F10>', ":DapStepOver<CR>", { buffer = bufnr, desc = 'Debug Step Over' })
 vim.keymap.set('n', '<F11>', ":DapStepInto<CR>", { buffer = bufnr, desc = 'Debug Step Into' })
 vim.keymap.set('n', '<leader><F11>', ":DapStepOut<CR>", { buffer = bufnr, desc = 'Debug Step Out' })
+
+vim.keymap.set('n', 'H', "^", { buffer = bufnr })
+vim.keymap.set('n', 'L', "$", { buffer = bufnr })
+vim.keymap.set('n', 'K', "gg", { buffer = bufnr })
+vim.keymap.set('n', 'J', "G", { buffer = bufnr })
+
+
+vim.keymap.set('v', '<leader>jj', ':!jq<cr>:setfiletype json<cr>', { buffer = bufnr, desc = '' })
+vim.keymap.set('v', '<leader>jk', ':!jq -r tostring<cr>:setfiletype json<cr>', { buffer = bufnr, desc = '' })
 
 -- TODO show error when dap continue doesn't work on start
