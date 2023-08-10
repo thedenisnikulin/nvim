@@ -16,6 +16,16 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+	--{
+	--	'codota/tabnine-nvim',
+	--	build = "./dl_binaries.sh",
+	--	config = function()
+	--		require('tabnine').setup({
+	--			accept_keymap = "<C-x>",
+	--			exclude_filetypes = { "TelescopePrompt" },
+	--		})
+	--	end
+	--},
 	{
 		"mfussenegger/nvim-lint",
 		config = function()
@@ -383,6 +393,8 @@ vim.wo.linebreak = true
 --vim.wo.list = false
 
 vim.o.termguicolors = true
+
+vim.opt.colorcolumn = "80"
 
 -- Set backups
 vim.opt.backupdir = '/home/rw_panic0_0/.backup/nvim/'
