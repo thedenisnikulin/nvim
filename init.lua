@@ -16,16 +16,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-	--{
-	--	'codota/tabnine-nvim',
-	--	build = "./dl_binaries.sh",
-	--	config = function()
-	--		require('tabnine').setup({
-	--			accept_keymap = "<C-x>",
-	--			exclude_filetypes = { "TelescopePrompt" },
-	--		})
-	--	end
-	--},
+	-- language support
 	{
 		"mfussenegger/nvim-lint",
 		config = function()
@@ -48,22 +39,164 @@ require("lazy").setup({
 		ft = { "go", 'gomod' },
 		build = ':lua require("go.install").update_all_sync()'
 	},
+	{ 'michaelb/sniprun',              build = 'bash ./install.sh' },
 
+
+
+
+	-- UI
 	{ 'kvrohit/mellow.nvim' },
-	{ "folke/neodev.nvim",                      opts = {} },
-	{ "mfussenegger/nvim-dap" },
-	{ "nvim-telescope/telescope-dap.nvim" },
-	{ 'mg979/vim-visual-multi',                 branch = 'master' },
-	{ "numToStr/Comment.nvim",                  opts = {} },
-	{ "folke/which-key.nvim",                   opts = {} },
-	{ "stevearc/dressing.nvim",                 event = "VeryLazy" },
+	{ "stevearc/dressing.nvim",        event = "VeryLazy" },
 	{ "xiyaowong/telescope-emoji.nvim" },
+	{
+		'kevinhwang91/nvim-hlslens',
+		config = function()
+			require('hlslens').setup()
+		end
+	},
+	{
+		"folke/zen-mode.nvim",
+		config = function()
+			require("zen-mode").setup {}
+		end
+	},
+	{
+		"theHamsta/nvim-dap-virtual-text",
+		config = function()
+			require("nvim-dap-virtual-text").setup {}
+		end
+	},
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		opts = {
+			char = "»",
+			show_trailing_blankline_indent = false,
+		},
+	},
+	--{
+	--	"karb94/neoscroll.nvim",
+	--	config = function()
+	--		require('neoscroll').setup()
+	--	end
+	--},
+	{
+		"folke/noice.nvim",
+		dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify", },
+		config = function()
+			require("noice").setup({
+				cmdline = {
+					format = {
+						cmdline = { icon = ">" },
+						search_down = { icon = "search [v]" },
+						search_up = { icon = "search [^]" },
+						filter = { icon = "filter" },
+						lua = { icon = "lua" },
+						help = { icon = "help" },
+					}
+				}
+			})
+		end
+	},
+	{
+		'echasnovski/mini.indentscope',
+		version = false,
+		config = function()
+			require('mini.indentscope').setup()
+		end
+	},
 	{ "RRethy/vim-illuminate" },
+	{
+		"petertriho/nvim-scrollbar",
+		config = function()
+			require('scrollbar').setup({
+				handlers = {
+					search = true,
+				}
+			})
+		end
+	},
+	--{
+	--	'akinsho/bufferline.nvim',
+	--	version = "*",
+	--	dependencies = 'nvim-tree/nvim-web-devicons',
+	--	config = function()
+	--		require("bufferline").setup {}
+	--	end
+	--},
+	{ "folke/which-key.nvim", opts = {} },
+	{
+		"nvim-lualine/lualine.nvim",
+		opts = {
+			options = {
+				icons_enabled = false,
+				theme = "tokyonight",
+				--theme = "mellow",
+				component_separators = "|",
+				section_separators = "",
+			},
+			sections = {
+				lualine_c = {
+					{
+						'filename',
+						path = 1,
+					}
+				},
+				lualine_x = {
+					{
+						function() return [[DEBUG: ]] .. require('dap').status() end,
+						cond = function() return string.len(require('dap').status()) ~= 0 end,
+						color = "WarningMsg"
+					},
+					{ "encoding" },
+					{ "fileformat" },
+					{ "filetype" },
+				}
+			}
+		},
+	},
+	{
+		'folke/tokyonight.nvim',
+		config = function()
+			require('tokyonight').setup({
+				style = "night",
+				on_colors = function(colors)
+					colors.bg = "#08080b"
+				end,
+				on_highlights = function(highlights, colors)
+					highlights.DiagnosticUnderlineError = {
+						undercurl = false
+					}
+					highlights.DiagnosticUnderlineHint = {
+						undercurl = false
+					}
+					highlights.DiagnosticUnderlineInfo = {
+						undercurl = false
+					}
+					highlights.DiagnosticUnderlineWarn = {
+						undercurl = false
+					}
+				end
+			})
+			vim.cmd [[colorscheme tokyonight]]
+			--vim.cmd [[colorscheme mellow]]
+		end
+	},
+	{
+		"lewis6991/gitsigns.nvim",
+		opts = {
+			signs = {
+				add = { text = "+" },
+				change = { text = "~" },
+				delete = { text = "_" },
+				topdelete = { text = "‾" },
+				changedelete = { text = "~" },
+			},
+		},
+		config = function()
+			require("gitsigns").setup()
+		end
+	},
 	{ 'nvim-treesitter/nvim-treesitter-context' },
-	{ "tpope/vim-sleuth" },
-	{ "tpope/vim-surround" },
-	{ 'michaelb/sniprun',                       build = 'bash ./install.sh' },
-	{ "APZelos/blamer.nvim" },
 	{
 		'kevinhwang91/nvim-ufo',
 		dependencies = 'kevinhwang91/promise-async',
@@ -77,25 +210,25 @@ require("lazy").setup({
 		end
 	},
 	{
-		"lewis6991/gitsigns.nvim",
-		config = function()
-			require("gitsigns").setup()
-		end
+		"nvim-telescope/telescope-file-browser.nvim",
+		requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
 	},
 	{
-		'kevinhwang91/nvim-hlslens',
+		'echasnovski/mini.pairs',
+		version = false,
 		config = function()
-			require('hlslens').setup()
+			require('mini.pairs').setup()
 		end
 	},
+
+
+
+
+	-- motions
 	{
-		"petertriho/nvim-scrollbar",
+		"ggandor/leap.nvim",
 		config = function()
-			require('scrollbar').setup({
-				handlers = {
-					search = true,
-				}
-			})
+			require('leap').add_default_mappings()
 		end
 	},
 	{
@@ -106,10 +239,38 @@ require("lazy").setup({
 			}
 		end
 	},
+	{ 'mg979/vim-visual-multi',                 branch = 'master' },
+
+
+
+
+	-- etc
+	{ "folke/neodev.nvim",                      opts = {} },
+	{ "tpope/vim-sleuth" },
+	{ "tpope/vim-surround" },
+	--{
+	--	'codota/tabnine-nvim',
+	--	build = "./dl_binaries.sh",
+	--	config = function()
+	--		require('tabnine').setup({
+	--			accept_keymap = "<C-x>",
+	--			exclude_filetypes = { "TelescopePrompt" },
+	--		})
+	--	end
+	--},
+	{ "APZelos/blamer.nvim" },
 	{
-		"theHamsta/nvim-dap-virtual-text",
+		"folke/todo-comments.nvim",
+		requires = "nvim-lua/plenary.nvim",
 		config = function()
-			require("nvim-dap-virtual-text").setup {}
+			require("todo-comments").setup {
+				highlight = {
+					pattern = [[.*<(KEYWORDS)\s* ]]
+				},
+				search = {
+					pattern = [[\b(KEYWORDS)\b]],
+				}
+			}
 		end
 	},
 	{
@@ -131,78 +292,18 @@ require("lazy").setup({
 			}
 		end
 	},
-	{
-		"folke/zen-mode.nvim",
-		config = function()
-			require("zen-mode").setup {}
-		end
-	},
-	{
-		"karb94/neoscroll.nvim",
-		config = function()
-			require('neoscroll').setup()
-		end
-	},
-	{
-		"folke/noice.nvim",
-		dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify", },
-		config = function()
-			require("noice").setup({
-				cmdline = {
-					format = {
-						cmdline = { icon = ">" },
-						search_down = { icon = "search [v]" },
-						search_up = { icon = "search [^]" },
-						filter = { icon = "filter" },
-						lua = { icon = "lua" },
-						help = { icon = "help" },
-					}
-				}
-			})
-		end
-	},
-	{
-		"ggandor/leap.nvim",
-		config = function()
-			require('leap').add_default_mappings()
-		end
-	},
-	{
-		'echasnovski/mini.pairs',
-		version = false,
-		config = function()
-			require('mini.pairs').setup()
-		end
-	},
-	{
-		'echasnovski/mini.indentscope',
-		version = false,
-		config = function()
-			require('mini.indentscope').setup()
-		end
-	},
-	{
-		'akinsho/bufferline.nvim',
-		version = "*",
-		dependencies = 'nvim-tree/nvim-web-devicons',
-		config = function()
-			require("bufferline").setup {}
-		end
-	},
-	{
-		"folke/todo-comments.nvim",
-		requires = "nvim-lua/plenary.nvim",
-		config = function()
-			require("todo-comments").setup {
-				highlight = {
-					pattern = [[.*<(KEYWORDS)\s* ]]
-				},
-				search = {
-					pattern = [[\b(KEYWORDS)\b]],
-				}
-			}
-		end
-	},
+
+
+
+
+	-- debug
+	{ "mfussenegger/nvim-dap" },
+	{ "nvim-telescope/telescope-dap.nvim" },
+
+
+
+
+	-- core
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.1",
@@ -246,11 +347,6 @@ require("lazy").setup({
 			telescope.load_extension('dap')
 		end
 	},
-
-	{
-		"nvim-telescope/telescope-file-browser.nvim",
-		requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
-	},
 	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
@@ -266,87 +362,11 @@ require("lazy").setup({
 			"hrsh7th/cmp-buffer" },
 	},
 	{
-		"lewis6991/gitsigns.nvim",
-		opts = {
-			signs = {
-				add = { text = "+" },
-				change = { text = "~" },
-				delete = { text = "_" },
-				topdelete = { text = "‾" },
-				changedelete = { text = "~" },
-			},
-		},
-	},
-	{
-		"nvim-lualine/lualine.nvim",
-		opts = {
-			options = {
-				icons_enabled = false,
-				theme = "tokyonight",
-				--theme = "mellow",
-				component_separators = "|",
-				section_separators = "",
-			},
-			sections = {
-				lualine_c = {
-					{
-						'filename',
-						path = 1,
-					}
-				},
-				lualine_x = {
-					{
-						function() return [[DEBUG: ]] .. require('dap').status() end,
-						cond = function() return string.len(require('dap').status()) ~= 0 end,
-						color = "WarningMsg"
-					},
-					{ "encoding" },
-					{ "fileformat" },
-					{ "filetype" },
-				}
-			}
-		},
-	},
-	{
-		"lukas-reineke/indent-blankline.nvim",
-		opts = {
-			char = "»",
-			show_trailing_blankline_indent = false,
-		},
-	},
-	{
 		"nvim-treesitter/nvim-treesitter",
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter-textobjects",
 		},
 		build = ":TSUpdate",
-	},
-	{
-		'folke/tokyonight.nvim',
-		config = function()
-			require('tokyonight').setup({
-				style = "night",
-				on_colors = function(colors)
-					colors.bg = "#08080b"
-				end,
-				on_highlights = function(highlights, colors)
-					highlights.DiagnosticUnderlineError = {
-						undercurl = false
-					}
-					highlights.DiagnosticUnderlineHint = {
-						undercurl = false
-					}
-					highlights.DiagnosticUnderlineInfo = {
-						undercurl = false
-					}
-					highlights.DiagnosticUnderlineWarn = {
-						undercurl = false
-					}
-				end
-			})
-			vim.cmd [[colorscheme tokyonight]]
-			--vim.cmd [[colorscheme mellow]]
-		end
 	},
 })
 
@@ -640,6 +660,8 @@ vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = "Hover [d]i
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Diagnostic list" })
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, { buffer = bufnr, desc = 'LSP [r]ename' })
 vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'LSP Code [a]ction' })
+vim.keymap.set('n', '<leader>1a', ':Telescope commands default_text=Go theme=cursor<CR>',
+	{ buffer = bufnr, desc = 'Golang code [a]ction' })
 vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = bufnr, desc = 'LSP Hover Documentation' })
 vim.keymap.set('n', '<leader>c', ":bdelete<CR>", { buffer = bufnr, desc = '[c]lose buffer' })
 vim.keymap.set('n', '<leader>C', ":bdelete!<CR>", { buffer = bufnr, desc = '[C]lose buffer (unsaved)' })
@@ -652,6 +674,7 @@ vim.keymap.set('n', '<leader>o', 'o<Esc>0"_D', { buffer = bufnr, desc = 'New lin
 vim.keymap.set('n', '<leader>O', 'O<Esc>0"_D', { buffer = bufnr, desc = 'New line above' })
 vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'Structured [s]earch and [r]eplace' })
 vim.keymap.set('n', '<leader>gb', ':BlamerToggle<CR>', { buffer = bufnr, desc = '[g]it [b]lame' })
+--
 
 -- goto maps
 vim.keymap.set('n', 'gn', ":bnext<CR>", { buffer = bufnr, desc = 'Goto buffer [n]ext' })
@@ -692,6 +715,9 @@ vim.keymap.set('n', 'H', "^", { buffer = bufnr })
 vim.keymap.set('n', 'L', "$", { buffer = bufnr })
 vim.keymap.set('n', 'K', "gg", { buffer = bufnr })
 vim.keymap.set('n', 'J', "G", { buffer = bufnr })
+
+vim.keymap.set('n', '<C-e>', '3<C-e>', { buffer = bufnr })
+vim.keymap.set('n', '<C-y>', '3<C-y>', { buffer = bufnr })
 
 
 vim.keymap.set('v', '<leader>jj', ':!jq<cr>:setfiletype json<cr>', { buffer = bufnr, desc = '' })
