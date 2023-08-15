@@ -292,6 +292,11 @@ require("lazy").setup({
 			}
 		end
 	},
+	{
+		"sourcegraph/sg.nvim",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		build = "nvim -l build/init.lua",
+	},
 
 
 
@@ -585,6 +590,20 @@ cmp.setup({
 	window = {
 		completion = cmp.config.window.bordered(),
 		documentation = cmp.config.window.bordered(),
+	},
+	sorting = {
+		comparators = {
+			cmp.config.compare.offset,
+			cmp.config.compare.exact,
+			cmp.config.compare.kind,
+			-- compare.scopes,
+			cmp.config.compare.score,
+			cmp.config.compare.recently_used,
+			cmp.config.compare.locality,
+			-- compare.sort_text,
+			cmp.config.compare.length,
+			cmp.config.compare.order,
+		}
 	}
 })
 
