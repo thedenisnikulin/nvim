@@ -240,6 +240,7 @@ require("lazy").setup({
 		end
 	},
 	{ 'mg979/vim-visual-multi',                 branch = 'master' },
+	{ 'ThePrimeagen/harpoon' },
 
 
 
@@ -337,6 +338,15 @@ require("lazy").setup({
 						},
 					},
 					preview = { ls_short = true },
+				},
+				pickers = {
+					buffers = {
+						mappings = {
+							i = {
+								["<A-d>"] = actions.delete_buffer
+							}
+						}
+					}
 				},
 				extensions = {
 					file_browser = {
@@ -619,7 +629,7 @@ dap.adapters.delve = {
 	type = 'server',
 	port = '${port}',
 	executable = {
-		command = 'dlv',
+		command = '/usr/bin/dlv',
 		args = { 'dap', '-l', '127.0.0.1:${port}' },
 	}
 }
@@ -684,7 +694,7 @@ vim.keymap.set('n', '<leader>1a', ':Telescope commands default_text=Go theme=cur
 vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = bufnr, desc = 'LSP Hover Documentation' })
 vim.keymap.set('n', '<leader>c', ":bdelete<CR>", { buffer = bufnr, desc = '[c]lose buffer' })
 vim.keymap.set('n', '<leader>C', ":bdelete!<CR>", { buffer = bufnr, desc = '[C]lose buffer (unsaved)' })
-vim.keymap.set('n', '<leader>n', ":tabnew<CR>", { buffer = bufnr, desc = '[n]ew tab' })
+vim.keymap.set('n', '<leader>n', ":enew<CR>", { buffer = bufnr, desc = '[n]ew tab' })
 vim.keymap.set('n', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
 vim.keymap.set('v', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
 vim.keymap.set('n', '<leader>z', ":ZenMode<CR>", { buffer = bufnr, desc = '[z]en mode' })
@@ -693,7 +703,17 @@ vim.keymap.set('n', '<leader>o', 'o<Esc>0"_D', { buffer = bufnr, desc = 'New lin
 vim.keymap.set('n', '<leader>O', 'O<Esc>0"_D', { buffer = bufnr, desc = 'New line above' })
 vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'Structured [s]earch and [r]eplace' })
 vim.keymap.set('n', '<leader>gb', ':BlamerToggle<CR>', { buffer = bufnr, desc = '[g]it [b]lame' })
---
+
+-- harpoon
+vim.keymap.set('n', ',.', ':lua require("harpoon.ui").toggle_quick_menu()<cr>',
+	{ buffer = bufnr, desc = '[h]arpoon menu' })
+vim.keymap.set('n', ',m', ':lua require("harpoon.mark").add_file()<cr>',
+	{ buffer = bufnr, desc = '[h]arpoon mark' })
+vim.keymap.set('n', ',n', ':lua require("harpoon.ui").nav_next()<cr>',
+	{ buffer = bufnr, desc = '[h]arpoon next' })
+vim.keymap.set('n', ',p', ':lua require("harpoon.ui").nav_prev()<cr>',
+	{ buffer = bufnr, desc = '[h]arpoon prev' })
+
 
 -- goto maps
 vim.keymap.set('n', 'gn', ":bnext<CR>", { buffer = bufnr, desc = 'Goto buffer [n]ext' })
