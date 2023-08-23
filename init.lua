@@ -81,7 +81,7 @@ require("lazy").setup({
 	--},
 	{
 		"folke/noice.nvim",
-		dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify", },
+		dependencies = { "MunifTanjim/nui.nvim" },
 		config = function()
 			require("noice").setup({
 				cmdline = {
@@ -431,6 +431,10 @@ vim.o.termguicolors = true
 
 vim.opt.colorcolumn = "80"
 
+vim.g.netrw_keepdir = 0
+vim.g.netrw_bufsettings = 'noma nomod nu nobl nowrap ro'
+vim.opt.shell = 'fish'
+
 -- Set backups
 vim.opt.backupdir = '/home/rw_panic0_0/.backup/nvim/'
 vim.opt.backup = true
@@ -676,6 +680,7 @@ dap.configurations.c = dap.configurations.cpp
 dap.configurations.rust = dap.configurations.cpp
 
 -- space maps
+--vim.keymap.set("n", "<leader>f", ":Explore<cr>", { noremap = true, desc = "[f]ile browser" })
 vim.keymap.set("n", "<leader>f", ":Telescope file_browser path=%:p:h<CR>", { noremap = true, desc = "[f]ile browser" })
 vim.keymap.set("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true, desc = "[b]uffers" })
 vim.keymap.set("n", "<leader>D", ":Telescope diagnostics<CR>",
