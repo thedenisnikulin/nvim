@@ -16,6 +16,9 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+	"tpope/vim-dadbod",
+	"kristijanhusak/vim-dadbod-completion",
+	"kristijanhusak/vim-dadbod-ui",
 	-- language support
 	{
 		"mfussenegger/nvim-lint",
@@ -115,14 +118,6 @@ require("lazy").setup({
 			})
 		end
 	},
-	--{
-	--	'akinsho/bufferline.nvim',
-	--	version = "*",
-	--	dependencies = 'nvim-tree/nvim-web-devicons',
-	--	config = function()
-	--		require("bufferline").setup {}
-	--	end
-	--},
 	{ "folke/which-key.nvim", opts = {} },
 	{
 		"nvim-lualine/lualine.nvim",
@@ -130,7 +125,6 @@ require("lazy").setup({
 			options = {
 				icons_enabled = false,
 				theme = "tokyonight",
-				--theme = "mellow",
 				component_separators = "|",
 				section_separators = "",
 			},
@@ -178,7 +172,6 @@ require("lazy").setup({
 				end
 			})
 			vim.cmd [[colorscheme tokyonight]]
-			--vim.cmd [[colorscheme mellow]]
 		end
 	},
 	{
@@ -688,7 +681,7 @@ vim.keymap.set("n", "<leader>D", ":Telescope diagnostics<CR>",
 vim.keymap.set("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true, desc = "Document [s]ymbols" })
 vim.keymap.set("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true, desc = "Workspace [S]ymbols" })
 vim.keymap.set("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true, desc = "[l]ive grep" })
-vim.keymap.set("n", "<leader>F", ":Telescope filetypes<CR>", { noremap = true, desc = "[F]iletypes list" })
+vim.keymap.set("n", "<leader>F", ":Telescope filetypes theme=dropdown<CR>", { noremap = true, desc = "[F]iletypes list" })
 vim.keymap.set('n', '<leader>N', ":Noice telescope<CR>", { buffer = bufnr, desc = '[N]otification history' })
 vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = "Hover [d]iagnostic" })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Diagnostic list" })
