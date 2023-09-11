@@ -64,12 +64,6 @@ require("lazy").setup({
 		end
 	},
 	{
-		"theHamsta/nvim-dap-virtual-text",
-		config = function()
-			require("nvim-dap-virtual-text").setup {}
-		end
-	},
-	{
 		"lukas-reineke/indent-blankline.nvim",
 		opts = {
 			char = "»",
@@ -135,16 +129,6 @@ require("lazy").setup({
 						path = 1,
 					}
 				},
-				lualine_x = {
-					{
-						function() return [[DEBUG: ]] .. require('dap').status() end,
-						cond = function() return string.len(require('dap').status()) ~= 0 end,
-						color = "WarningMsg"
-					},
-					{ "encoding" },
-					{ "fileformat" },
-					{ "filetype" },
-				}
 			}
 		},
 	},
@@ -295,13 +279,6 @@ require("lazy").setup({
 
 
 
-	-- debug
-	{ "mfussenegger/nvim-dap" },
-	{ "nvim-telescope/telescope-dap.nvim" },
-
-
-
-
 	-- core
 	{
 		"nvim-telescope/telescope.nvim",
@@ -352,7 +329,6 @@ require("lazy").setup({
 			})
 			telescope.load_extension("file_browser")
 			telescope.load_extension("emoji")
-			telescope.load_extension('dap')
 		end
 	},
 	{
@@ -614,63 +590,6 @@ cmp.setup({
 	}
 })
 
--- dap
-local dap = require("dap")
-dap.adapters.lldb = {
-	type = 'executable',
-	command = '/usr/bin/lldb-vscode', -- adjust as needed, must be absolute path
-	name = 'lldb'
-}
-
-dap.adapters.delve = {
-	type = 'server',
-	port = '${port}',
-	executable = {
-		command = '/usr/bin/dlv',
-		args = { 'dap', '-l', '127.0.0.1:${port}' },
-	}
-}
-
-dap.configurations.go = {
-	{
-		type = "delve",
-		name = "Debug",
-		request = "launch",
-		program = "${file}"
-	},
-	{
-		type = "delve",
-		name = "Debug test", -- configuration for debugging test files
-		request = "launch",
-		mode = "test",
-		program = "${file}"
-	},
-	-- works with go.mod packages and sub packages
-	{
-		type = "delve",
-		name = "Debug test (go.mod)",
-		request = "launch",
-		mode = "test",
-		program = "./${relativeFileDirname}"
-	}
-}
-
-dap.configurations.cpp = {
-	{
-		name = 'Launch',
-		type = 'lldb',
-		request = 'launch',
-		program = function()
-			return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-		end,
-		cwd = '${workspaceFolder}',
-		stopOnEntry = false,
-		args = {},
-	},
-}
-
-dap.configurations.c = dap.configurations.cpp
-dap.configurations.rust = dap.configurations.cpp
 
 -- space maps
 --vim.keymap.set("n", "<leader>f", ":Explore<cr>", { noremap = true, desc = "[f]ile browser" })
@@ -728,26 +647,6 @@ vim.keymap.set('n', 'gt', require('telescope.builtin').lsp_type_definitions,
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
--- debug maps
-local dap_widgets = require('dap.ui.widgets')
-vim.keymap.set('n', '<leader>;b', ":Telescope dap list_breakpoints<CR>",
-	{ buffer = bufnr, desc = 'List debug [b]reakpoints' })
-vim.keymap.set('n', '<leader>;c', ":Telescope dap commands<CR>", { buffer = bufnr, desc = 'List debug [c]ommands' })
-vim.keymap.set('n', '<leader>;C', ":Telescope dap configurations<CR>",
-	{ buffer = bufnr, desc = 'List debug [C]onfigurations' })
-vim.keymap.set('n', '<leader>;v', function() dap_widgets.centered_float(dap_widgets.scopes) end,
-	{ buffer = bufnr, desc = 'List debug [v]ariables' })
-vim.keymap.set('n', '<leader>;f', function() dap_widgets.centered_float(dap_widgets.frames) end,
-	{ buffer = bufnr, desc = 'List debug [f]rames' })
-vim.keymap.set('n', '<leader>K', function() dap_widgets.hover() end,
-	{ buffer = bufnr, desc = 'Debug Hover' })
-
-vim.keymap.set('n', '<leader>B', ":DapToggleBreakpoint<CR>", { buffer = bufnr, desc = 'Toggle [B]reakpoint' })
-vim.keymap.set('n', '<F5>', ":DapContinue<CR>", { buffer = bufnr, desc = 'Debug Continue' })
-vim.keymap.set('n', '<F10>', ":DapStepOver<CR>", { buffer = bufnr, desc = 'Debug Step Over' })
-vim.keymap.set('n', '<F11>', ":DapStepInto<CR>", { buffer = bufnr, desc = 'Debug Step Into' })
-vim.keymap.set('n', '<leader><F11>', ":DapStepOut<CR>", { buffer = bufnr, desc = 'Debug Step Out' })
-
 vim.keymap.set('n', 'H', "^", { buffer = bufnr })
 vim.keymap.set('n', 'L', "$", { buffer = bufnr })
 vim.keymap.set('n', 'K', "gg", { buffer = bufnr })
@@ -759,5 +658,3 @@ vim.keymap.set('n', '<C-y>', '3<C-y>', { buffer = bufnr })
 
 vim.keymap.set('v', '<leader>jj', ':!jq<cr>:setfiletype json<cr>', { buffer = bufnr, desc = '' })
 vim.keymap.set('v', '<leader>jk', ':!jq -r tostring<cr>:setfiletype json<cr>', { buffer = bufnr, desc = '' })
-
--- TODO show error when dap continue doesn't work on start
