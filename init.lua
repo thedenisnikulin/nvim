@@ -325,7 +325,7 @@ require("lazy").setup({
 	{
 		"hrsh7th/nvim-cmp",
 		dependencies = { "hrsh7th/cmp-nvim-lsp", "L3MON4D3/LuaSnip", "saadparwaiz1/cmp_luasnip",
-			"hrsh7th/cmp-buffer" },
+			"hrsh7th/cmp-buffer", "hrsh7th/cmp-calc", "hrsh7th/cmp-path" },
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -551,10 +551,9 @@ cmp.setup({
 	sources = {
 		{ name = "nvim_lsp" },
 		{ name = "luasnip" },
-	},
-	window = {
-		completion = cmp.config.window.bordered(),
-		documentation = cmp.config.window.bordered(),
+		{ name = "buffer" },
+		{ name = 'calc' },
+		{ name = 'path' }
 	},
 	sorting = {
 		comparators = {
