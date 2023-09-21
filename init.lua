@@ -16,9 +16,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-	"tpope/vim-dadbod",
-	"kristijanhusak/vim-dadbod-completion",
-	"kristijanhusak/vim-dadbod-ui",
 	-- language support
 	{
 		"mfussenegger/nvim-lint",
@@ -44,9 +41,6 @@ require("lazy").setup({
 	},
 	{ 'michaelb/sniprun',              build = 'bash ./install.sh' },
 
-
-
-
 	-- UI
 	{ 'kvrohit/mellow.nvim' },
 	{ "stevearc/dressing.nvim",        event = "VeryLazy" },
@@ -70,12 +64,6 @@ require("lazy").setup({
 			show_trailing_blankline_indent = false,
 		},
 	},
-	--{
-	--	"karb94/neoscroll.nvim",
-	--	config = function()
-	--		require('neoscroll').setup()
-	--	end
-	--},
 	{
 		"folke/noice.nvim",
 		dependencies = { "MunifTanjim/nui.nvim" },
@@ -198,9 +186,6 @@ require("lazy").setup({
 		end
 	},
 
-
-
-
 	-- motions
 	{
 		"ggandor/leap.nvim",
@@ -219,10 +204,10 @@ require("lazy").setup({
 	{ 'mg979/vim-visual-multi',                 branch = 'master' },
 	{ 'ThePrimeagen/harpoon' },
 
-
-
-
 	-- etc
+	{ "tpope/vim-dadbod" },
+	{ "kristijanhusak/vim-dadbod-completion" },
+	{ "kristijanhusak/vim-dadbod-ui" },
 	{ "folke/neodev.nvim",                      opts = {} },
 	{ "tpope/vim-sleuth" },
 	{ "tpope/vim-surround" },
@@ -275,9 +260,6 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim" },
 		build = "nvim -l build/init.lua",
 	},
-
-
-
 
 	-- core
 	{
@@ -466,7 +448,7 @@ require("nvim-treesitter.configs").setup({
 	},
 })
 
-local on_attach = function(_, bufnr)
+local on_attach = function(_, _)
 	vim.cmd([[autocmd BufWritePre <buffer> lua vim.lsp.buf.format()]])
 end
 
@@ -592,8 +574,8 @@ cmp.setup({
 
 
 -- space maps
---vim.keymap.set("n", "<leader>f", ":Explore<cr>", { noremap = true, desc = "[f]ile browser" })
 vim.keymap.set("n", "<leader>f", ":Telescope file_browser path=%:p:h<CR>", { noremap = true, desc = "[f]ile browser" })
+--vim.keymap.set("n", "<leader>f", ":Explore<cr>", { noremap = true, desc = "[f]ile browser" })
 vim.keymap.set("n", "<leader>b", ":Telescope buffers<CR>", { noremap = true, desc = "[b]uffers" })
 vim.keymap.set("n", "<leader>D", ":Telescope diagnostics<CR>",
 	{ noremap = true, desc = "[D]iagnostics list" })
@@ -631,7 +613,6 @@ vim.keymap.set('n', ',n', ':lua require("harpoon.ui").nav_next()<cr>',
 vim.keymap.set('n', ',p', ':lua require("harpoon.ui").nav_prev()<cr>',
 	{ buffer = bufnr, desc = '[h]arpoon prev' })
 
-
 -- goto maps
 vim.keymap.set('n', 'gn', ":bnext<CR>", { buffer = bufnr, desc = 'Goto buffer [n]ext' })
 vim.keymap.set('n', 'gp', ":bprevious<CR>", { buffer = bufnr, desc = 'Goto buffer [p]revious' })
@@ -654,7 +635,6 @@ vim.keymap.set('n', 'J', "G", { buffer = bufnr })
 
 vim.keymap.set('n', '<C-e>', '3<C-e>', { buffer = bufnr })
 vim.keymap.set('n', '<C-y>', '3<C-y>', { buffer = bufnr })
-
 
 vim.keymap.set('v', '<leader>jj', ':!jq<cr>:setfiletype json<cr>', { buffer = bufnr, desc = '' })
 vim.keymap.set('v', '<leader>jk', ':!jq -r tostring<cr>:setfiletype json<cr>', { buffer = bufnr, desc = '' })
