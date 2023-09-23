@@ -126,7 +126,7 @@ require("lazy").setup({
 			require('tokyonight').setup({
 				style = "night",
 				on_colors = function(colors)
-					colors.bg = "#08080b"
+					colors.bg = "#0a0a0d"
 				end,
 				on_highlights = function(highlights, colors)
 					highlights.DiagnosticUnderlineError = {
@@ -185,6 +185,7 @@ require("lazy").setup({
 			require('mini.pairs').setup()
 		end
 	},
+	{ 'kevinhwang91/nvim-bqf' },
 
 	-- motions
 	{
@@ -201,14 +202,14 @@ require("lazy").setup({
 			}
 		end
 	},
-	{ 'mg979/vim-visual-multi',                 branch = 'master' },
+	{ 'mg979/vim-visual-multi',              branch = 'master' },
 	{ 'ThePrimeagen/harpoon' },
 
 	-- etc
 	{ "tpope/vim-dadbod" },
 	{ "kristijanhusak/vim-dadbod-completion" },
 	{ "kristijanhusak/vim-dadbod-ui" },
-	{ "folke/neodev.nvim",                      opts = {} },
+	{ "folke/neodev.nvim",                   opts = {} },
 	{ "tpope/vim-sleuth" },
 	{ "tpope/vim-surround" },
 	--{
@@ -255,11 +256,7 @@ require("lazy").setup({
 			}
 		end
 	},
-	{
-		"sourcegraph/sg.nvim",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		build = "nvim -l build/init.lua",
-	},
+	{ "Marskey/telescope-sg" },
 
 	-- core
 	{
@@ -278,7 +275,7 @@ require("lazy").setup({
 					},
 					mappings = {
 						i = {
-							["<esc>"] = actions.close,
+							--["<esc>"] = actions.close,
 							["<C-a>"] = actions.toggle_selection,
 
 							["<Tab>"] = actions.move_selection_next,
@@ -298,7 +295,7 @@ require("lazy").setup({
 								["<A-d>"] = actions.delete_buffer
 							}
 						}
-					}
+					},
 				},
 				extensions = {
 					file_browser = {
@@ -307,10 +304,16 @@ require("lazy").setup({
 						preview = { ls_short = true },
 						hidden = { file_browser = true, folder_browser = true },
 					},
+					ast_grep = {
+						command = { "ast-grep", "--json=stream" },
+						grep_open_files = false,
+						lang = nil,
+					}
 				},
 			})
 			telescope.load_extension("file_browser")
 			telescope.load_extension("emoji")
+			telescope.load_extension('ast_grep')
 		end
 	},
 	{
@@ -581,6 +584,7 @@ vim.keymap.set("n", "<leader>D", ":Telescope diagnostics<CR>",
 vim.keymap.set("n", "<leader>s", ":Telescope lsp_document_symbols<CR>", { noremap = true, desc = "Document [s]ymbols" })
 vim.keymap.set("n", "<leader>S", ":Telescope lsp_workspace_symbols<CR>", { noremap = true, desc = "Workspace [S]ymbols" })
 vim.keymap.set("n", "<leader>l", ":Telescope live_grep<CR>", { noremap = true, desc = "[l]ive grep" })
+vim.keymap.set("n", "<leader>L", ":Telescope ast_grep<CR>", { noremap = true, desc = "AST grep" })
 vim.keymap.set("n", "<leader>F", ":Telescope filetypes theme=dropdown<CR>", { noremap = true, desc = "[F]iletypes list" })
 vim.keymap.set('n', '<leader>N', ":Noice telescope<CR>", { buffer = bufnr, desc = '[N]otification history' })
 vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = "Hover [d]iagnostic" })
