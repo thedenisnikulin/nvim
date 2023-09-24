@@ -52,9 +52,12 @@ require("lazy").setup({
 		end
 	},
 	{
-		"folke/zen-mode.nvim",
+		"shortcuts/no-neck-pain.nvim",
+		version = "*",
 		config = function()
-			require("zen-mode").setup {}
+			require("no-neck-pain").setup {
+				width = 110
+			}
 		end
 	},
 	{
@@ -103,22 +106,31 @@ require("lazy").setup({
 	{ "folke/which-key.nvim", opts = {} },
 	{
 		"nvim-lualine/lualine.nvim",
-		opts = {
-			options = {
-				icons_enabled = false,
-				theme = "tokyonight",
-				component_separators = "|",
-				section_separators = "",
-			},
-			sections = {
-				lualine_c = {
-					{
-						'filename',
-						path = 1,
-					}
+		config = function()
+			local custom_tokyo = require 'lualine.themes.tokyonight'
+			custom_tokyo.normal.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.insert.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.visual.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.replace.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.command.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.inactive.b.bg = custom_tokyo.inactive.c.bg
+			require("lualine").setup({
+				options = {
+					icons_enabled = false,
+					theme = custom_tokyo,
+					component_separators = "|",
+					section_separators = "",
 				},
-			}
-		},
+				sections = {
+					lualine_c = {
+						{
+							'%=filename',
+							path = 2,
+						}
+					},
+				}
+			})
+		end
 	},
 	{
 		'folke/tokyonight.nvim',
@@ -599,7 +611,7 @@ vim.keymap.set('n', '<leader>C', ":bdelete!<CR>", { buffer = bufnr, desc = '[C]l
 vim.keymap.set('n', '<leader>n', ":enew<CR>", { buffer = bufnr, desc = '[n]ew tab' })
 vim.keymap.set('n', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
 vim.keymap.set('v', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un code snippet' })
-vim.keymap.set('n', '<leader>z', ":ZenMode<CR>", { buffer = bufnr, desc = '[z]en mode' })
+vim.keymap.set('n', '<leader>z', ":NoNeckPain<CR>", { buffer = bufnr, desc = '[z]en mode' })
 vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'Structured [s]earch and [r]eplace' })
 vim.keymap.set('n', '<leader>o', 'o<Esc>0"_D', { buffer = bufnr, desc = 'New line below' })
 vim.keymap.set('n', '<leader>O', 'O<Esc>0"_D', { buffer = bufnr, desc = 'New line above' })
