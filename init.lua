@@ -584,7 +584,6 @@ vim.keymap.set('v', '<leader>R', ":SnipRun<CR>", { buffer = bufnr, desc = '[R]un
 vim.keymap.set('n', '<leader>z',
 	function() if not require('nvim-tree.api').tree.is_visible() then vim.cmd('NoNeckPain') end end,
 	{ buffer = bufnr, desc = '[z]en mode' })
-vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'Structured [s]earch and [r]eplace' })
 vim.keymap.set('n', '<leader>o', 'o<Esc>0"_D', { buffer = bufnr, desc = 'New line below' })
 vim.keymap.set('n', '<leader>O', 'O<Esc>0"_D', { buffer = bufnr, desc = 'New line above' })
 vim.keymap.set('n', '<leader>gb', ':BlamerToggle<CR>', { buffer = bufnr, desc = '[g]it [b]lame' })
