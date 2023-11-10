@@ -51,15 +51,8 @@ require("lazy").setup({
 		end
 	},
 	{
-		"nvim-pack/nvim-spectre",
-		config = function()
-			require('spectre').setup()
-		end
-	},
-	{
 		'axkirillov/hbac.nvim',
 		dependencies = {
-			-- these are optional, add them, if you want the telescope module
 			'nvim-telescope/telescope.nvim',
 			'nvim-lua/plenary.nvim',
 			'nvim-tree/nvim-web-devicons'
@@ -242,26 +235,13 @@ require("lazy").setup({
 			}
 		end
 	},
-	{ 'mg979/vim-visual-multi',              branch = 'master' },
+	{ 'mg979/vim-visual-multi', branch = 'master' },
 	{ 'ThePrimeagen/harpoon' },
 
 	-- etc
-	{ "tpope/vim-dadbod" },
-	{ "kristijanhusak/vim-dadbod-completion" },
-	{ "kristijanhusak/vim-dadbod-ui" },
-	{ "folke/neodev.nvim",                   opts = {} },
+	{ "folke/neodev.nvim",      opts = {} },
 	{ "tpope/vim-sleuth" },
 	{ "tpope/vim-surround" },
-	--{
-	--	'codota/tabnine-nvim',
-	--	build = "./dl_binaries.sh",
-	--	config = function()
-	--		require('tabnine').setup({
-	--			accept_keymap = "<C-x>",
-	--			exclude_filetypes = { "TelescopePrompt" },
-	--		})
-	--	end
-	--},
 	{ "APZelos/blamer.nvim" },
 	{
 		"folke/todo-comments.nvim",
@@ -277,25 +257,6 @@ require("lazy").setup({
 			}
 		end
 	},
-	{
-		"cshuaimin/ssr.nvim",
-		config = function()
-			require("ssr").setup {
-				border = "rounded",
-				min_width = 50,
-				min_height = 5,
-				max_width = 120,
-				max_height = 25,
-				keymaps = {
-					close = "q",
-					next_match = "n",
-					prev_match = "N",
-					replace_confirm = "<CR>",
-					replace_all = "<leader><cr>",
-				},
-			}
-		end
-	},
 	{ "Marskey/telescope-sg" },
 
 	-- core
@@ -305,7 +266,6 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function()
 			local telescope = require("telescope")
-			local actions = require("telescope.actions")
 			telescope.setup({
 				defaults = {
 					initial_mode = "normal",
@@ -315,30 +275,9 @@ require("lazy").setup({
 						prompt_position = 'top',
 						width = 150
 					},
-					mappings = {
-						i = {
-							["<Tab>"] = actions.move_selection_next,
-							["<S-Tab>"] = actions.move_selection_previous,
-						},
-					},
 					preview = { ls_short = true },
 				},
-				pickers = {
-					buffers = {
-						mappings = {
-							i = {
-								["<A-d>"] = actions.delete_buffer
-							}
-						}
-					},
-				},
 				extensions = {
-					file_browser = {
-						grouped = true,
-						dir_icon = "󰉋",
-						preview = { ls_short = true },
-						hidden = { file_browser = true, folder_browser = true },
-					},
 					ast_grep = {
 						command = { "ast-grep", "--json=stream" },
 						grep_open_files = false,
@@ -346,7 +285,6 @@ require("lazy").setup({
 					}
 				},
 			})
-			telescope.load_extension("file_browser")
 			telescope.load_extension("emoji")
 			telescope.load_extension('ast_grep')
 		end
@@ -649,7 +587,6 @@ vim.keymap.set('n', '<leader>z',
 vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'Structured [s]earch and [r]eplace' })
 vim.keymap.set('n', '<leader>o', 'o<Esc>0"_D', { buffer = bufnr, desc = 'New line below' })
 vim.keymap.set('n', '<leader>O', 'O<Esc>0"_D', { buffer = bufnr, desc = 'New line above' })
-vim.keymap.set('n', '<leader>sr', require("ssr").open, { buffer = bufnr, desc = 'Structured [s]earch and [r]eplace' })
 vim.keymap.set('n', '<leader>gb', ':BlamerToggle<CR>', { buffer = bufnr, desc = '[g]it [b]lame' })
 vim.keymap.set('n', ';\'', ':set wrap!<CR>', { buffer = bufnr, desc = 'Toggle text wrap' })
 vim.keymap.set('n', '<leader>\\', ':NvimTreeToggle<CR>', { buffer = bufnr, desc = 'Toggle file tree' })
@@ -675,14 +612,9 @@ vim.keymap.set('n', 'gi', require('telescope.builtin').lsp_implementations,
 vim.keymap.set('n', 'gt', require('telescope.builtin').lsp_type_definitions,
 	{ buffer = bufnr, desc = 'Goto [t]ype Definition' })
 
--- remap for dealing with word wrap
+-- dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
-vim.keymap.set('n', 'H', "^", { buffer = bufnr })
-vim.keymap.set('n', 'L', "$", { buffer = bufnr })
-vim.keymap.set('n', 'K', "gg", { buffer = bufnr })
-vim.keymap.set('n', 'J', "G", { buffer = bufnr })
 
 vim.keymap.set('n', '<C-e>', '3<C-e>', { buffer = bufnr })
 vim.keymap.set('n', '<C-y>', '3<C-y>', { buffer = bufnr })
