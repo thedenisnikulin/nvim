@@ -17,17 +17,46 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 	{
+		"aznhe21/actions-preview.nvim",
+	},
+	{
+		'mvllow/modes.nvim',
+		tag = 'v0.2.0',
+		config = function()
+			require('modes').setup()
+		end
+	},
+	{
+		"utilyre/barbecue.nvim",
+		name = "barbecue",
+		version = "*",
+		dependencies = {
+			"SmiteshP/nvim-navic",
+			"nvim-tree/nvim-web-devicons",
+		},
+		config = function()
+			require("barbecue").setup {}
+		end
+	},
+	{
+		'VidocqH/lsp-lens.nvim',
+		config = function()
+			require 'lsp-lens'.setup {
+				sections = {
+					definition = false,
+					references = true,
+					implements = true,
+					git_authors = false,
+				},
+			}
+		end,
+	},
+	{
 		"nvim-tree/nvim-tree.lua",
 		config = function()
 			require("nvim-tree").setup {
 				view = { adaptive_size = true }
 			}
-		end
-	},
-	{
-		"rebelot/kanagawa.nvim",
-		config = function()
-			vim.cmd [[colorscheme kanagawa]]
 		end
 	},
 	{
@@ -95,7 +124,6 @@ require("lazy").setup({
 	{ 'michaelb/sniprun',              build = 'bash ./install.sh' },
 
 	-- UI
-	{ 'kvrohit/mellow.nvim' },
 	{ "stevearc/dressing.nvim",        event = "VeryLazy" },
 	{ "xiyaowong/telescope-emoji.nvim" },
 	{
@@ -165,10 +193,17 @@ require("lazy").setup({
 	{
 		"nvim-lualine/lualine.nvim",
 		config = function()
+			local custom_tokyo = require 'lualine.themes.tokyonight'
+			custom_tokyo.normal.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.insert.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.visual.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.replace.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.command.b.bg = custom_tokyo.normal.c.bg
+			custom_tokyo.inactive.b.bg = custom_tokyo.inactive.c.bg
 			require("lualine").setup({
 				options = {
 					icons_enabled = false,
-					theme = "kanagawa",
+					theme = custom_tokyo,
 					component_separators = "|",
 					section_separators = "",
 				},
@@ -183,6 +218,32 @@ require("lazy").setup({
 					},
 				}
 			})
+		end
+	},
+	{
+		'folke/tokyonight.nvim',
+		config = function()
+			require('tokyonight').setup({
+				style = "night",
+				on_colors = function(colors)
+					colors.bg = "#0a0a0d"
+				end,
+				on_highlights = function(highlights, _)
+					highlights.DiagnosticUnderlineError = {
+						undercurl = false
+					}
+					highlights.DiagnosticUnderlineHint = {
+						undercurl = false
+					}
+					highlights.DiagnosticUnderlineInfo = {
+						undercurl = false
+					}
+					highlights.DiagnosticUnderlineWarn = {
+						undercurl = false
+					}
+				end
+			})
+			vim.cmd [[colorscheme tokyonight]]
 		end
 	},
 	{
@@ -205,7 +266,7 @@ require("lazy").setup({
 		dependencies = 'kevinhwang91/promise-async',
 		config = function()
 			require('ufo').setup({
-				provider_selector = function(bufnr, filetype, buftype)
+				provider_selector = function()
 					return { 'treesitter', 'indent' }
 				end
 			})
@@ -309,59 +370,31 @@ require("lazy").setup({
 	},
 })
 
-
--- Set leader key
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
-
--- Set tab size
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
-
--- Set highlight on search
 vim.o.hlsearch = false
-
--- Make line numbers default
 vim.wo.number = true
-
--- Enable relative numbers
 vim.o.relativenumber = true
-
--- Enable mouse mode
 vim.o.mouse = "a"
-
--- Sync clipboard between OS and Neovim.
 vim.o.clipboard = "unnamedplus"
-
--- Enable break indent
 vim.o.breakindent = true
-
--- Keep signcolumn on by default
 vim.wo.signcolumn = "yes"
-
--- Decrease update time
 vim.o.updatetime = 250
 vim.o.timeout = true
 vim.o.timeoutlen = 300
-
--- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,noselect"
-
 vim.wo.wrap = false
 vim.wo.linebreak = true
---vim.wo.list = false
-
 vim.o.termguicolors = true
-
 vim.opt.colorcolumn = "80"
-
 vim.g.netrw_keepdir = 0
 vim.g.netrw_bufsettings = 'noma nomod nu nobl nowrap ro'
 vim.opt.shell = 'fish'
-
--- Set backups
 vim.opt.backupdir = '/home/rw_panic0_0/.backup/nvim/'
 vim.opt.backup = true
+
 vim.api.nvim_create_autocmd('BufWritePre', {
 	group = vim.api.nvim_create_augroup('timestamp_backupext', { clear = true }),
 	desc = 'Add timestamp to backup extension',
@@ -383,7 +416,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
 	end,
 })
 
--- [[ Highlight on yank ]]
+-- highlight on yank
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -395,12 +428,8 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 require("nvim-treesitter.configs").setup({
-	-- Add languages to be installed here that you want installed for treesitter
 	ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "tsx", "typescript", "vimdoc", "vim" },
-
-	-- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
 	auto_install = false,
-
 	highlight = { enable = true },
 	indent = { enable = true, disable = { "python" } },
 	incremental_selection = {
@@ -415,11 +444,11 @@ require("nvim-treesitter.configs").setup({
 	textobjects = {
 		select = {
 			enable = true,
-			lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+			lookahead = true,
 		},
 		move = {
 			enable = true,
-			set_jumps = true, -- whether to set jumps in the jumplist
+			set_jumps = true,
 		},
 		swap = {
 			enable = true,
@@ -554,7 +583,6 @@ cmp.setup({
 
 -- space maps
 vim.keymap.set("n", "<leader>f", ":Oil<CR>", { noremap = true, desc = "[f]ile browser" })
---vim.keymap.set("n", "<leader>f", ":Explore<cr>", { noremap = true, desc = "[f]ile browser" })
 vim.keymap.set("n", "<leader>b", ':lua require("buffer_manager.ui").toggle_quick_menu()<CR>',
 	{ noremap = true, desc = "[b]uffers" })
 vim.keymap.set("n", "<leader>B", ":BufferTabs<CR>", { noremap = true, desc = "[b]uffers" })
@@ -569,7 +597,7 @@ vim.keymap.set('n', '<leader>N', ":Noice telescope<CR>", { buffer = bufnr, desc 
 vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = "Hover [d]iagnostic" })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Diagnostic list" })
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, { buffer = bufnr, desc = 'LSP [r]ename' })
-vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'LSP Code [a]ction' })
+vim.keymap.set('n', '<leader>a', require("actions-preview").code_actions, { buffer = bufnr, desc = 'LSP Code [a]ction' })
 vim.keymap.set('n', '<leader>1a', ':Telescope commands default_text=Go theme=cursor<CR>',
 	{ buffer = bufnr, desc = 'Golang code [a]ction' })
 vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, { buffer = bufnr, desc = 'LSP Hover Documentation' })
@@ -588,14 +616,14 @@ vim.keymap.set('n', ';\'', ':set wrap!<CR>', { buffer = bufnr, desc = 'Toggle te
 vim.keymap.set('n', '<leader>\\', ':NvimTreeToggle<CR>', { buffer = bufnr, desc = 'Toggle file tree' })
 
 -- harpoon
-vim.keymap.set('n', ',.', ':lua require("harpoon.ui").toggle_quick_menu()<cr>',
-	{ buffer = bufnr, desc = '[h]arpoon menu' })
+vim.keymap.set('n', ',,', ':lua require("harpoon.ui").toggle_quick_menu()<cr>',
+	{ buffer = bufnr, desc = 'harpoon menu' })
 vim.keymap.set('n', ',m', ':lua require("harpoon.mark").add_file()<cr>',
-	{ buffer = bufnr, desc = '[h]arpoon mark' })
+	{ buffer = bufnr, desc = 'harpoon [m]ark' })
 vim.keymap.set('n', ',n', ':lua require("harpoon.ui").nav_next()<cr>',
-	{ buffer = bufnr, desc = '[h]arpoon next' })
+	{ buffer = bufnr, desc = 'harpoon [n]ext' })
 vim.keymap.set('n', ',p', ':lua require("harpoon.ui").nav_prev()<cr>',
-	{ buffer = bufnr, desc = '[h]arpoon prev' })
+	{ buffer = bufnr, desc = 'harpoon [p]rev' })
 
 -- goto maps
 vim.keymap.set('n', 'gn', ":bnext<CR>", { buffer = bufnr, desc = 'Goto buffer [n]ext' })
